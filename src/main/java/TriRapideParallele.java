@@ -52,7 +52,9 @@ public class TriRapideParallele implements Runnable {
             nbTaches.addAndGet(1);
             trierRapidementSequentiel(p+1, fin); ;
         }
-        nbTaches.decrementAndGet();
+        nbTaches.addAndGet(-1);
+        if(nbTaches.get() == 0)
+            executeur.shutdown();
     }
 
     private void trierRapidement() {
@@ -76,7 +78,9 @@ public class TriRapideParallele implements Runnable {
             nbTaches.addAndGet(1);
             trierRapidementSequentiel( p+1, fin);
         }
-        nbTaches.decrementAndGet();
+        nbTaches.addAndGet(-1);
+        if(nbTaches.get() == 0)
+            executeur.shutdown();
     }
 
     private static void afficher(int[] t, int début, int fin) {
@@ -106,10 +110,6 @@ public class TriRapideParallele implements Runnable {
 
         executeur.execute(tri);
 
-        while(nbTaches.get() != 0){
-
-        }
-        executeur.shutdown();
         // Il faut maintenant attendre la fin des calculs
 
         try {

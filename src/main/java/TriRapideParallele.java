@@ -47,9 +47,12 @@ public class TriRapideParallele implements Runnable {
     private static void trierRapidementSequentiel(int[] t, int début, int fin) {
         if (début < fin) {                             // S'il y a un seul élément, il n'y a rien à faire!
             int p = partitionner(t, début, fin) ;
+            nbTaches.addAndGet(1);
             trierRapidementSequentiel(t, début, p-1); ;
+            nbTaches.addAndGet(1);
             trierRapidementSequentiel(t, p+1, fin); ;
         }
+        nbTaches.decrementAndGet();
     }
 
     private void trierRapidement() {
@@ -74,7 +77,7 @@ public class TriRapideParallele implements Runnable {
             trierRapidementSequentiel(tableau, p+1, fin);
         }
         nbTaches.decrementAndGet();
-        if(nbTaches.compareAndSet(0,nbTaches.get()))
+        if(nbTaches.get() == 0)
             executeur.shutdown();
     }
 

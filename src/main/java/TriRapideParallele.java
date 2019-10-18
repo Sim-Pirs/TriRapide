@@ -8,7 +8,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class TriRapideParallele implements Runnable {
     static final int taille = 100_000_000 ;                   // Longueur du tableau à trier
-    static final int [] tableau = new int[taille] ;         // Le tableau d'entiers à trier 
+    static final int [] tableau = new int[taille] ;         // Le tableau d'entiers à trier
     static final int borne = 10 * taille ;                  // Valeur maximale dans le tableau
 
     private int début;
@@ -25,39 +25,39 @@ public class TriRapideParallele implements Runnable {
         this.fin = fin;
     }
 
-    private static void echangerElements(int[] t, int m, int n) {
-        int temp = t[m] ;
-        t[m] = t[n] ;
-        t[n] = temp ;
+    private static void echangerElements(int m, int n) {
+        int temp = tableau[m] ;
+        tableau[m] = tableau[n] ;
+        tableau[n] = temp ;
     }
 
-    private static int partitionner(int[] t, int début, int fin) {
-        int v = t[fin] ;                               // Choix (arbitraire) du pivot : t[fin]
+    private static int partitionner(int début, int fin) {
+        int v = tableau[fin] ;                               // Choix (arbitraire) du pivot : t[fin]
         int place = début ;                            // Place du pivot, à droite des éléments déplacés
         for (int i = début ; i<fin ; i++) {            // Parcours du *reste* du tableau
-            if (t[i] < v) {                            // Cette valeur t[i] doit être à droite du pivot
-                echangerElements(t, i, place) ;        // On le place à sa place
+            if (tableau[i] < v) {                            // Cette valeur t[i] doit être à droite du pivot
+                echangerElements(i, place) ;        // On le place à sa place
                 place++ ;                              // On met à jour la place du pivot
             }
         }
-        echangerElements(t, place, fin) ;              // Placement définitif du pivot
+        echangerElements(place, fin) ;              // Placement définitif du pivot
         return place ;
     }
 
-    private static void trierRapidementSequentiel(int[] t, int début, int fin) {
+    private static void trierRapidementSequentiel(int début, int fin) {
         if (début < fin) {                             // S'il y a un seul élément, il n'y a rien à faire!
-            int p = partitionner(t, début, fin) ;
+            int p = partitionner(début, fin) ;
             nbTaches.addAndGet(1);
-            trierRapidementSequentiel(t, début, p-1); ;
+            trierRapidementSequentiel(début, p-1); ;
             nbTaches.addAndGet(1);
-            trierRapidementSequentiel(t, p+1, fin); ;
+            trierRapidementSequentiel(p+1, fin); ;
         }
         nbTaches.decrementAndGet();
     }
 
     private void trierRapidement() {
         if (fin - début > 1000 && fin - début > 0.01 * taille) {                             // S'il y a un seul élément, il n'y a rien à faire!
-            int p = partitionner(tableau, début, fin) ;
+            int p = partitionner(début, fin) ;
 
             nbTaches.addAndGet(1);
             TriRapideParallele tri1 = new TriRapideParallele(début, p-1);
@@ -69,16 +69,14 @@ public class TriRapideParallele implements Runnable {
             executeur.submit(tri2);
         }
         else if(début < fin){
-            int p = partitionner(tableau, début, fin) ;
+            int p = partitionner( début, fin) ;
 
             nbTaches.addAndGet(1);
-            trierRapidementSequentiel(tableau, début, p-1);
+            trierRapidementSequentiel( début, p-1);
             nbTaches.addAndGet(1);
-            trierRapidementSequentiel(tableau, p+1, fin);
+            trierRapidementSequentiel( p+1, fin);
         }
         nbTaches.decrementAndGet();
-        if(nbTaches.get() == 0)
-            executeur.shutdown();
     }
 
     private static void afficher(int[] t, int début, int fin) {
@@ -108,6 +106,10 @@ public class TriRapideParallele implements Runnable {
 
         executeur.execute(tri);
 
+        while(nbTaches.get() != 0){
+
+        }
+        executeur.shutdown();
         // Il faut maintenant attendre la fin des calculs
 
         try {

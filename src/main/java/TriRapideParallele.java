@@ -48,26 +48,23 @@ public class TriRapideParallele implements Runnable {
         if (début < fin) {                             // S'il y a un seul élément, il n'y a rien à faire!
             int p = partitionner(début, fin) ;
             nbTaches.addAndGet(1);
-            trierRapidementSequentiel(début, p-1); ;
+            trierRapidementSequentiel(début, p-1);
             nbTaches.addAndGet(1);
-            trierRapidementSequentiel(p+1, fin); ;
+            trierRapidementSequentiel(p+1, fin);
         }
         nbTaches.addAndGet(-1);
-        if(nbTaches.get() == 0)
-            executeur.shutdown();
     }
 
     private void trierRapidement() {
         if (fin - début > 1000 && fin - début > 0.01 * taille) {                             // S'il y a un seul élément, il n'y a rien à faire!
             int p = partitionner(début, fin) ;
 
-            nbTaches.addAndGet(1);
             TriRapideParallele tri1 = new TriRapideParallele(début, p-1);
-
-            nbTaches.addAndGet(1);
             TriRapideParallele tri2 = new TriRapideParallele( p+1, fin);
 
+            nbTaches.addAndGet(1);
             executeur.submit(tri1);
+            nbTaches.addAndGet(1);
             executeur.submit(tri2);
         }
         else if(début < fin){
@@ -108,6 +105,7 @@ public class TriRapideParallele implements Runnable {
 
         TriRapideParallele tri = new TriRapideParallele( 0, taille-1);
 
+        nbTaches.addAndGet(1);
         executeur.execute(tri);
 
         // Il faut maintenant attendre la fin des calculs

@@ -1,5 +1,12 @@
 // -*- coding: utf-8 -*-
 
+/**
+ * Sur mon ordi, taille = 100_000_000
+ * Temps séquentiel : 10,472 secondes
+ * Temps parallèle : 5,626 secondes
+ */
+
+
 import java.util.Random;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;

@@ -13,7 +13,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class TriRapideParallele implements Runnable {
+public class TriRapideParalleleOptimal implements Runnable {
     static final int taille = 100_000_000 ;                   // Longueur du tableau à trier
     static final int [] tableau = new int[taille] ;         // Le tableau d'entiers à trier
     static final int borne = 10 * taille ;                  // Valeur maximale dans le tableau
@@ -22,15 +22,18 @@ public class TriRapideParallele implements Runnable {
     private int début;
     private int fin;
 
+    private int P;
+
     static int nbThreads = Runtime.getRuntime().availableProcessors();
 
     static volatile ExecutorService executeur = Executors.newFixedThreadPool(nbThreads);
 
     static volatile AtomicInteger nbTaches = new AtomicInteger(0);
 
-    private TriRapideParallele(int début, int fin) {
+    private TriRapideParalleleOptimal(int début, int fin, int P) {
         this.début = début;
         this.fin = fin;
+        this.P = P;
     }
 
     private static void echangerElements(int m, int n) {
@@ -63,13 +66,13 @@ public class TriRapideParallele implements Runnable {
         nbTaches.addAndGet(-1);
     }
 
-    private void trierRapidement() {
-
-        if (fin - début > 1000 && fin - début > 0.01 * taille) {                             // S'il y a un seul élément, il n'y a rien à faire!
+    private void trierRapidementOptimale() {
+        if (fin - début > (P*0.01) * taille) {                             // S'il y a un seul élément, il n'y a rien à faire!
+            //System.out.println("oui");
             int p = partitionner(début, fin) ;
 
-            TriRapideParallele tri1 = new TriRapideParallele(début, p-1);
-            TriRapideParallele tri2 = new TriRapideParallele( p+1, fin);
+            TriRapideParalleleOptimal tri1 = new TriRapideParalleleOptimal(début, p-1, P);
+            TriRapideParalleleOptimal tri2 = new TriRapideParalleleOptimal( p+1, fin, P);
 
             nbTaches.addAndGet(1);
             executeur.submit(tri1);
@@ -100,7 +103,7 @@ public class TriRapideParallele implements Runnable {
         System.out.print("\n") ;
     }
 
-    public static void lancer(int seed) {
+    public static void lancer(int seed, int P) {
         Random alea = new Random(seed) ;
 
         for (int i=0 ; i<taille ; i++) {                          // Remplissage aléatoire du tableau
@@ -112,7 +115,7 @@ public class TriRapideParallele implements Runnable {
         System.out.println("Démarrage du tri rapide parallèle.") ;
         long débutDuTri = System.nanoTime();
 
-        TriRapideParallele tri = new TriRapideParallele( 0, taille-1);
+        TriRapideParalleleOptimal tri = new TriRapideParalleleOptimal( 0, taille-1, P);
 
         nbTaches.addAndGet(1);
         executeur.execute(tri);
@@ -127,7 +130,7 @@ public class TriRapideParallele implements Runnable {
             e.printStackTrace();
         }
 
-         // Il n'y a plus aucune tâche à soumettre
+        // Il n'y a plus aucune tâche à soumettre
 
         long finDuTri = System.nanoTime();
         duréeDuTri = (finDuTri - débutDuTri) / 1_000_000 ;
@@ -142,7 +145,7 @@ public class TriRapideParallele implements Runnable {
 
     @Override
     public void run() {
-        trierRapidement();
+        trierRapidementOptimale();
     }
 }
 

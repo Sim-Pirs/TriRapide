@@ -127,6 +127,8 @@ public class TriRapideParallele implements Runnable {
             e.printStackTrace();
         }
 
+        System.out.println("");
+
          // Il n'y a plus aucune tâche à soumettre
 
         long finDuTri = System.nanoTime();

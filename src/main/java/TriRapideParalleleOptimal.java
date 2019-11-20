@@ -68,7 +68,6 @@ public class TriRapideParalleleOptimal implements Runnable {
 
     private void trierRapidementOptimale() {
         if (fin - début > (P*0.01) * taille) {                             // S'il y a un seul élément, il n'y a rien à faire!
-            //System.out.println("oui");
             int p = partitionner(début, fin) ;
 
             TriRapideParalleleOptimal tri1 = new TriRapideParalleleOptimal(début, p-1, P);
@@ -129,6 +128,9 @@ public class TriRapideParalleleOptimal implements Runnable {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+
+        System.out.println("");
+
 
         // Il n'y a plus aucune tâche à soumettre
 

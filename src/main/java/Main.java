@@ -3,10 +3,10 @@ public class Main {
     public static void main(String[] args){
 
 
-        float gains;
+        float gain;
 
         TriRapideParallele.lancer(42);
-        TriRapideParalleleOptimal.lancer(42, 1);
+        TriRapideParalleleOptimal.lancer(42, 5);
         boolean identique = true;
 
         for (int i = 0; i < TriRapideParallele.taille; i++) {
@@ -23,9 +23,9 @@ public class Main {
         else
             System.out.println("Les tableaux sont triés et identiques");
 
-        gains = (float) TriRapideParallele.duréeDuTri / (float) TriRapideParalleleOptimal.duréeDuTri;
+        gain = (float) TriRapideParallele.duréeDuTri / (float) TriRapideParalleleOptimal.duréeDuTri;
 
-       System.out.println(gains);
+       System.out.println("Gain : " + gain);
 
     }
 }

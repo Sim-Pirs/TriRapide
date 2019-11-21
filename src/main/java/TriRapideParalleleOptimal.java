@@ -22,18 +22,17 @@ public class TriRapideParalleleOptimal implements Runnable {
     private int début;
     private int fin;
 
-    private int P;
-
     static int nbThreads = Runtime.getRuntime().availableProcessors();
 
     static volatile ExecutorService executeur = Executors.newFixedThreadPool(nbThreads);
 
     static volatile AtomicInteger nbTaches = new AtomicInteger(0);
 
-    private TriRapideParalleleOptimal(int début, int fin, int P) {
+    static volatile double P = 0.01;
+
+    private TriRapideParalleleOptimal(int début, int fin) {
         this.début = début;
         this.fin = fin;
-        this.P = P;
     }
 
     private static void echangerElements(int m, int n) {
@@ -66,12 +65,13 @@ public class TriRapideParalleleOptimal implements Runnable {
         nbTaches.addAndGet(-1);
     }
 
-    private void trierRapidementOptimale() {
-       /* if (fin - début > (P*0.01) * taille) {                             // S'il y a un seul élément, il n'y a rien à faire!
+    private void trierRapidement() {
+
+        if (fin - début > P * taille) {                             // 0.01 Est la valeur optimale
             int p = partitionner(début, fin) ;
 
-            TriRapideParalleleOptimal tri1 = new TriRapideParalleleOptimal(début, p-1, P);
-            TriRapideParalleleOptimal tri2 = new TriRapideParalleleOptimal( p+1, fin, P);
+            TriRapideParalleleOptimal tri1 = new TriRapideParalleleOptimal(début, p-1);
+            TriRapideParalleleOptimal tri2 = new TriRapideParalleleOptimal( p+1, fin);
 
             nbTaches.addAndGet(1);
             executeur.submit(tri1);
@@ -85,30 +85,7 @@ public class TriRapideParalleleOptimal implements Runnable {
             trierRapidementSequentiel( début, p-1);
             nbTaches.addAndGet(1);
             trierRapidementSequentiel( p+1, fin);
-        }*/
-
-       if(début < fin){
-           int p = partitionner(début,fin);
-
-           if((p-1)-début >= (P*0.01)*taille){
-               TriRapideParalleleOptimal tri1 = new TriRapideParalleleOptimal(début, p-1, this.P);
-               nbTaches.addAndGet(1);
-               executeur.submit(tri1);
-           }else{
-               nbTaches.addAndGet(1);
-               trierRapidementSequentiel( début, p-1);
-           }
-
-           if(fin-(p+1) >= (P*0.01)*taille){
-               TriRapideParalleleOptimal tri1 = new TriRapideParalleleOptimal(p+1, fin, this.P);
-               nbTaches.addAndGet(1);
-               executeur.submit(tri1);
-           }else{
-               nbTaches.addAndGet(1);
-               trierRapidementSequentiel( p+1, fin);
-           }
-
-       }
+        }
         nbTaches.addAndGet(-1);
         if(nbTaches.get() == 0)
             executeur.shutdown();
@@ -125,7 +102,7 @@ public class TriRapideParalleleOptimal implements Runnable {
         System.out.print("\n") ;
     }
 
-    public static void lancer(int seed, int P) {
+    public static void lancer(int seed) {
         Random alea = new Random(seed) ;
 
         for (int i=0 ; i<taille ; i++) {                          // Remplissage aléatoire du tableau
@@ -134,10 +111,10 @@ public class TriRapideParalleleOptimal implements Runnable {
 
         System.out.print("Tableau initial : ") ;
         afficher(tableau, 0, taille -1) ;                         // Affiche le tableau à trier
-        System.out.println("Démarrage du tri rapide parallèle optimal.") ;
+        System.out.println("Démarrage du tri rapide parallèle.") ;
         long débutDuTri = System.nanoTime();
 
-        TriRapideParalleleOptimal tri = new TriRapideParalleleOptimal( 0, taille-1, P);
+        TriRapideParalleleOptimal tri = new TriRapideParalleleOptimal( 0, taille-1);
 
         nbTaches.addAndGet(1);
         executeur.execute(tri);
@@ -154,7 +131,6 @@ public class TriRapideParalleleOptimal implements Runnable {
 
         System.out.println("");
 
-
         // Il n'y a plus aucune tâche à soumettre
 
         long finDuTri = System.nanoTime();
@@ -163,11 +139,14 @@ public class TriRapideParalleleOptimal implements Runnable {
         afficher(tableau, 0, taille -1) ;                         // Affiche le tableau obtenu
         System.out.println("obtenu en " + duréeDuTri + " millisecondes.") ;
 
+        /* Tri rapide sequentiel */
+
+
     }
 
     @Override
     public void run() {
-        trierRapidementOptimale();
+        trierRapidement();
     }
 }
 

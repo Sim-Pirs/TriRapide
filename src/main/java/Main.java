@@ -2,15 +2,14 @@ public class Main {
 
     public static void main(String[] args){
 
-
         float gain;
 
+        TriRapide.lancer(42);
         TriRapideParallele.lancer(42);
-        TriRapideParalleleOptimal.lancer(42, 5);
         boolean identique = true;
 
-        for (int i = 0; i < TriRapideParallele.taille; i++) {
-            if (TriRapideParallele.tableau[i] != TriRapideParalleleOptimal.tableau[i]) {
+        for (int i = 0; i < TriRapideParalleleOptimal.taille; i++) {
+            if (TriRapideParalleleOptimal.tableau[i] != TriRapideParalleleOptimal.tableau[i]) {
                 identique = false;
                 break;
             }
@@ -23,7 +22,7 @@ public class Main {
         else
             System.out.println("Les tableaux sont triés et identiques");
 
-        gain = (float) TriRapideParallele.duréeDuTri / (float) TriRapideParalleleOptimal.duréeDuTri;
+        gain = (float) TriRapideParalleleOptimal.duréeDuTri / (float) TriRapideParalleleOptimal.duréeDuTri;
 
        System.out.println("Gain : " + gain);
 
